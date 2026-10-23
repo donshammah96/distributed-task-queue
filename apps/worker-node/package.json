@@ -1,0 +1,27 @@
+{
+  "name": "@dtq/worker-node",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@dtq/adapter-bullmq": "workspace:*",
+    "@dtq/adapter-nats": "workspace:*",
+    "@dtq/database": "workspace:*",
+    "@dtq/queue-core": "workspace:*",
+    "@dtq/telemetry": "workspace:*",
+    "fastify": "^5.2.1"
+  },
+  "devDependencies": {
+    "@dtq/config": "workspace:*",
+    "@types/node": "^22.13.9",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  }
+}
