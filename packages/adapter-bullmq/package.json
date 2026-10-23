@@ -1,0 +1,27 @@
+{
+  "name": "@dtq/adapter-bullmq",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@dtq/database": "workspace:*",
+    "@dtq/queue-core": "workspace:*",
+    "@dtq/telemetry": "workspace:*",
+    "bullmq": "^5.41.6",
+    "ioredis": "^5.6.0",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@dtq/config": "workspace:*",
+    "@types/node": "^22.13.9",
+    "@types/uuid": "^10.0.0",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.7"
+  }
+}
