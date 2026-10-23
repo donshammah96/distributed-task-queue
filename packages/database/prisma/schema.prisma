@@ -1,0 +1,80 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum OutboxStatus {
+  PENDING
+  PUBLISHED
+  FAILED
+}
+
+enum IdempotencyStatus {
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+model OutboxEvent {
+  id            String       @id @default(uuid()) @db.Uuid
+  aggregateType String       @map("aggregate_type")
+  aggregateId   String       @map("aggregate_id")
+  topic         String       // Destination queue name
+  payload       Json
+  status        OutboxStatus @default(PENDING)
+  retryCount    Int          @default(0) @map("retry_count")
+  createdAt     DateTime     @default(now()) @map("created_at")
+  processedAt   DateTime?    @map("processed_at")
+
+  @@index([status, createdAt])
+  @@map("outbox_events")
+}
+
+model IdempotencyRecord {
+  idempotencyKey String            @id @map("idempotency_key")
+  jobId          String            @map("job_id")
+  status         IdempotencyStatus @default(IN_PROGRESS)
+  lockedUntil    DateTime          @map("locked_until")
+  resultHash     String?           @map("result_hash")
+  createdAt      DateTime          @default(now()) @map("created_at")
+  updatedAt      DateTime          @updatedAt @map("updated_at")
+
+  @@index([status, lockedUntil])
+  @@map("idempotency_records")
+}
+
+model JobExecutionLog {
+  id          String   @id @default(uuid()) @db.Uuid
+  jobId       String   @map("job_id")
+  queueName   String   @map("queue_name")
+  adapterType String   @map("adapter_type")
+  attempt     Int
+  status      String
+  durationMs  Int      @map("duration_ms")
+  errorStack  String?  @map("error_stack")
+  traceId     String?  @map("trace_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([jobId])
+  @@index([queueName, createdAt])
+  @@map("job_execution_logs")
+}
+
+model DeadLetterJob {
+  id             String    @id @default(uuid()) @db.Uuid
+  originalJobId  String    @map("original_job_id")
+  queueName      String    @map("queue_name")
+  payload        Json
+  failureReason  String    @map("failure_reason")
+  failedAt       DateTime  @default(now()) @map("failed_at")
+  replayed       Boolean   @default(false)
+  replayedAt     DateTime? @map("replayed_at")
+
+  @@index([queueName, failedAt])
+  @@index([replayed])
+  @@map("dead_letter_jobs")
+}
