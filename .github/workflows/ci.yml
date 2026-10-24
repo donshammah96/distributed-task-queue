@@ -36,16 +36,13 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-      nats:
-        image: nats:2.10-alpine
-        ports:
-          - 4222:4222
-          - 8222:8222
-        options: -js
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
+      - name: Start NATS with JetStream
+        run: |
+          docker run -d --name nats -p 4222:4222 -p 8222:8222 nats:2.10-alpine -js -m 8222
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
