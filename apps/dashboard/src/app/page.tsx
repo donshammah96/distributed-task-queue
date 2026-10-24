@@ -48,8 +48,9 @@ interface DeadLetterJob {
 }
 
 export default function DashboardPage() {
+  const [mounted, setMounted] = useState(false);
   const [telemetry, setTelemetry] = useState<TelemetryStreamData>({
-    timestamp: new Date().toISOString(),
+    timestamp: "2026-10-24T22:30:00.000Z",
     broker: "bullmq",
     queues: [
       {
@@ -93,7 +94,7 @@ export default function DashboardPage() {
       originalJobId: "job-89241-prod",
       queueName: "webhook.dispatcher",
       failureReason: "Downstream HTTP 503 Service Unavailable (3 attempts exhausted)",
-      failedAt: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
+      failedAt: "2026-10-24T22:25:00.000Z",
       replayed: false,
     },
     {
@@ -101,7 +102,7 @@ export default function DashboardPage() {
       originalJobId: "job-44102-prod",
       queueName: "media.dag.pipeline",
       failureReason: "Codec transcode frame corruption at keyframe #1844",
-      failedAt: new Date(Date.now() - 1000 * 60 * 18).toISOString(),
+      failedAt: "2026-10-24T22:12:00.000Z",
       replayed: true,
     },
   ]);
@@ -110,6 +111,10 @@ export default function DashboardPage() {
     "System initialized with high-concurrency worker pool",
     "Connected to transactional outbox relay poller",
   ]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeBroker, setActiveBroker] = useState<string>("bullmq");
@@ -578,7 +583,7 @@ export default function DashboardPage() {
 
           {/* Real-Time Action Log */}
           <div className="glass-panel rounded-2xl p-6 border border-slate-800 space-y-3">
-            <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider text-xs">
+            <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider text-xs">
               Live Engine Event Log
             </h3>
             <div className="space-y-2 max-h-60 overflow-y-auto font-mono text-xs text-slate-400">
@@ -635,8 +640,8 @@ export default function DashboardPage() {
                   <td className="py-3 text-rose-300 font-sans max-w-xs truncate" title={dlq.failureReason}>
                     {dlq.failureReason}
                   </td>
-                  <td className="py-3 text-slate-500 font-sans">
-                    {new Date(dlq.failedAt).toLocaleTimeString()}
+                  <td className="py-3 text-slate-500 font-sans" suppressHydrationWarning>
+                    {mounted ? new Date(dlq.failedAt).toLocaleTimeString() : "22:25:00"}
                   </td>
                   <td className="py-3 text-right font-sans">
                     {dlq.replayed ? (
